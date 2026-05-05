@@ -38,8 +38,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         request = self.context.get("request")
+
         if obj.image:
-            return request.build_absolute_uri(obj.image.url)
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url   # fallback (IMPORTANT)
+
         return None
 
 

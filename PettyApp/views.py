@@ -459,21 +459,25 @@ class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        profile, created = Profile.objects.get_or_create(user=request.user)
+
         serializer = ProfileSerializer(
-            request.user.profile,
-            context={"request": request}   # ✅ ADD THIS
+            profile,
+            context={"request": request}
         )
+
         data = serializer.data
         data["is_staff"] = request.user.is_staff
         return Response(data)
 
     def put(self, request):
-        profile = request.user.profile
+        profile, created = Profile.objects.get_or_create(user=request.user)
+
         serializer = ProfileSerializer(
             profile,
             data=request.data,
             partial=True,
-            context={"request": request}   # ✅ ADD THIS
+            context={"request": request}
         )
 
         if serializer.is_valid():
