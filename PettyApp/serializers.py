@@ -37,7 +37,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = Profile
         fields = "__all__"
 
-    def get_image(self, obj):
+    def get_image_url(self, obj):
         request = self.context.get("request")
 
         if obj.image:
