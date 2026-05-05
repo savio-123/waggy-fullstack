@@ -19,6 +19,7 @@ from django.conf import settings
 from django.db.models.functions import Coalesce,TruncDate
 from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly,IsAdminUser
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import ProductSerializer
 import razorpay
@@ -457,6 +458,7 @@ class ProductDetail(APIView):
     
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
         profile, created = Profile.objects.get_or_create(user=request.user)
@@ -479,6 +481,9 @@ class ProfileView(APIView):
             partial=True,
             context={"request": request}
         )
+
+        print(request.data)
+        print(request.FILES)
 
         if serializer.is_valid():
             serializer.save()

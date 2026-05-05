@@ -30,7 +30,8 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     username = serializers.ReadOnlyField(source="user.username")
     email = serializers.ReadOnlyField(source="user.email")
-    image = serializers.SerializerMethodField()   # ✅ ADD THIS
+    image = serializers.ImageField(required=False)  # ✅ ADD THIS
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Profile
