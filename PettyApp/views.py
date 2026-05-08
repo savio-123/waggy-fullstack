@@ -16,7 +16,7 @@ from urllib.parse import quote,unquote
 from django.contrib.auth import authenticate
 from django.db.models import Sum,Avg,Count
 from django.conf import settings
-from django.db.models.functions import Coalesce,TruncDate
+from django.db.models.functions import Coalesce,TruncDate,Round
 from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly,IsAdminUser
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -351,7 +351,7 @@ class ProductList(APIView):
               .select_related('category', 'user')\
               .prefetch_related('reviews')\
               .annotate(
-                avg_rating=Coalesce(Avg('reviews__rating'), 0.0),
+                avg_rating=Round(Coalesce(Avg('reviews__rating'), 0.0), 1),
                 total_reviews=Count('reviews')
             )
 
@@ -412,7 +412,7 @@ class ProductDetail(APIView):
         product = Product.objects.filter(id=id)\
             .select_related('category', 'user')\
             .annotate(
-                avg_rating=Avg('reviews__rating'),
+                avg_rating=Round(Coalesce(Avg('reviews__rating'), 0.0), 1),
                 total_reviews=Count('reviews')
             ).first()
 
@@ -482,9 +482,6 @@ class ProfileView(APIView):
             context={"request": request}
         )
 
-        print(request.data)
-        print(request.FILES)
-
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -551,7 +548,7 @@ class ProductByCategory(APIView):
 
         products = Product.objects.filter(is_approved=True)\
                     .annotate(
-                        avg_rating=Coalesce(Avg('reviews__rating'), 0.0),
+                        avg_rating=Round(Coalesce(Avg('reviews__rating'), 0.0), 1),
                         total_reviews=Count('reviews')
                     )
 
@@ -779,7 +776,7 @@ class RelatedProducts(APIView):
             ).exclude(id=id)\
             .select_related('category')\
             .annotate(
-                avg_rating=Avg('reviews__rating'),
+                avg_rating=Round(Coalesce(Avg('reviews__rating'), 0.0), 1),
                 total_reviews=Count('reviews')
             )[:8]
 
