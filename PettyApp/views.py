@@ -112,10 +112,6 @@ class ForgotPassword(APIView):
 
             reset_link = f"{frontend_url}/reset-password?uid={uid}&token={safe_token}"
 
-            print("UID:", uid)
-            print("TOKEN:", token)
-            print("VALID:", default_token_generator.check_token(user, token))
-
             send_mail(
                     "Password Reset",
                     "",   # ❌ remove plain text
@@ -912,7 +908,6 @@ class TestimonialList(APIView):
         return Response(TestimonialSerializer(data, many=True).data)
 
     def post(self, request):
-        print("USER:", request.user)
         serializer = TestimonialSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)  
