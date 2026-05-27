@@ -13,14 +13,14 @@ class ProductSerializer(serializers.ModelSerializer):
     total_reviews = serializers.IntegerField(read_only=True)
     category_name = serializers.CharField(source="category.name", read_only=True)
 
-    image = serializers.SerializerMethodField()  # ✅ FIX
+    image = serializers.SerializerMethodField() 
 
     class Meta:
         model = Product
         fields = '__all__'
         read_only_fields = ['user']  
 
-    def get_image(self, obj):  # ✅ FIX
+    def get_image(self, obj): 
         request = self.context.get("request")
         if obj.image:
             return request.build_absolute_uri(obj.image.url)

@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from google import genai
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 from .models import *
 from .serializers import *
 from django.utils import timezone
@@ -331,7 +332,7 @@ class PendingProducts(APIView):
                         ProductSerializer(
                             products,
                             many=True,
-                            context={"request": request}   # ✅ FIX
+                            context={"request": request}  
                         ).data
                     )    
     
@@ -356,7 +357,16 @@ class ProductList(APIView):
             )
 
         if query:
-            data = data.filter(name__icontains=query)
+            words = query.split()
+
+            search_query = Q()
+
+            for word in words:
+                search_query |= Q(name__icontains=word)
+                search_query |= Q(description__icontains=word)
+                search_query |= Q(category__name__icontains=word)
+
+            data = data.filter(search_query).distinct()
 
         if category and category != "all":
             data = data.filter(category__name__icontains=category)
@@ -387,7 +397,7 @@ class ProductList(APIView):
         serializer = ProductSerializer(
                                     result_page,
                                     many=True,
-                                    context={"request": request}   # ✅ FIX
+                                    context={"request": request}  
                                 )
         return paginator.get_paginated_response(serializer.data)
 
