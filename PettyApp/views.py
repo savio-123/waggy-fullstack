@@ -359,14 +359,14 @@ class ProductList(APIView):
         if query:
             words = query.split()
 
-            search_query = Q()
-
             for word in words:
-                search_query |= Q(name__icontains=word)
-                search_query |= Q(description__icontains=word)
-                search_query |= Q(category__name__icontains=word)
+                data = data.filter(
+                    Q(name__icontains=word) |
+                    Q(description__icontains=word) |
+                    Q(category__name__icontains=word)
+                )
 
-            data = data.filter(search_query).distinct()
+            data = data.distinct()
 
         if category and category != "all":
             data = data.filter(category__name__icontains=category)
