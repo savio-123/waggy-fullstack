@@ -109,7 +109,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class BlogSerializer(serializers.ModelSerializer):
     total_likes = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
-    image = serializers.SerializerMethodField()
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Blog
@@ -131,7 +131,7 @@ class BlogSerializer(serializers.ModelSerializer):
 
         return False
 
-    def get_image(self, obj):
+    def get_image_url(self, obj):
         request = self.context.get("request")
 
         if not obj.image:

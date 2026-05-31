@@ -622,7 +622,9 @@ class CategoryDetail(APIView):
 
 # BLOGS
 class BlogList(APIView):
+    
     permission_classes = [IsAuthenticatedOrReadOnly]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
         data = Blog.objects.all()\
@@ -632,8 +634,6 @@ class BlogList(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-        print(request.data)
-        print(request.FILES)
 
         serializer = serializer = BlogSerializer(
                                         data=request.data,
