@@ -110,25 +110,37 @@ class BlogSerializer(serializers.ModelSerializer):
     total_likes = serializers.SerializerMethodField()
     is_liked = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Blog
-        fields = '__all__'
+        fields = "__all__"
 
     def get_total_likes(self, obj):
-        return obj.likes.count()    
-    
+        return obj.likes.count()
+
     def get_is_liked(self, obj):
-        user = self.context.get("request").user
+        request = self.context.get("request")
+
+        if not request:
+            return False
+
+        user = request.user
+
         if user.is_authenticated:
             return obj.likes.filter(user=user).exists()
+
         return False
-    
+
     def get_image(self, obj):
         request = self.context.get("request")
-        if obj.image:
+
+        if not obj.image:
+            return None
+
+        if request:
             return request.build_absolute_uri(obj.image.url)
-        return None
+
+        return obj.image.url
         
 
 class TestimonialSerializer(serializers.ModelSerializer):
