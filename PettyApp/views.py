@@ -632,6 +632,9 @@ class BlogList(APIView):
         return Response(serializer.data)
 
     def post(self, request):
+        print(request.data)
+        print(request.FILES)
+
         serializer = serializer = BlogSerializer(
                                         data=request.data,
                                         context={"request": request}
