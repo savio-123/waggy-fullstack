@@ -33,6 +33,7 @@ urlpatterns = [
     # BLOGS
     path('blogs/', BlogList.as_view()),
     path('blogs/<int:id>/', BlogDetail.as_view()),
+    path("my-blogs/", MyBlogs.as_view()),
     path("blogs/<int:blog_id>/like/", ToggleLike.as_view()),
     path("blogs/<int:blog_id>/comments/", CommentListCreate.as_view()),
     path("comments/<int:comment_id>/reply/", ReplyCreate.as_view()),

@@ -622,7 +622,7 @@ class CategoryDetail(APIView):
 
 # BLOGS
 class BlogList(APIView):
-    
+
     permission_classes = [IsAuthenticatedOrReadOnly]
     parser_classes = [MultiPartParser, FormParser]
 
@@ -647,6 +647,7 @@ class BlogList(APIView):
 
 class BlogDetail(APIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_object(self, id):
         return get_object_or_404(Blog, id=id)
@@ -660,7 +661,12 @@ class BlogDetail(APIView):
         blog = self.get_object(id)
         if blog.user != request.user:
             return Response({"error": "Not allowed"}, status=403)
-        serializer = BlogSerializer(blog, data=request.data,context={"request": request})
+        serializer = serializer = BlogSerializer(
+                                                    blog,
+                                                    data=request.data,
+                                                    partial=True,
+                                                    context={"request": request}
+                                                )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -672,6 +678,22 @@ class BlogDetail(APIView):
             return Response({"error": "Not allowed"}, status=403)
         blog.delete()
         return Response({"message": "Deleted"})
+    
+class MyBlogs(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        blogs = Blog.objects.filter(
+            user=request.user
+        ).order_by("-id")
+
+        serializer = BlogSerializer(
+            blogs,
+            many=True,
+            context={"request": request}
+        )
+
+        return Response(serializer.data)    
     
 class ToggleLike(APIView):
     permission_classes = [IsAuthenticated]
