@@ -940,7 +940,11 @@ class CreateRazorpayOrder(APIView):
 
         address = get_object_or_404(Address, id=address_id, user=user)
 
-        total = sum(item.product.price * item.quantity for item in items)
+        subtotal = sum(item.product.price * item.quantity for item in items)
+
+        platform_fee = 15
+
+        total = subtotal + platform_fee
 
         client = razorpay.Client(
             auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET)
@@ -974,7 +978,11 @@ class VerifyPayment(APIView):
 
         address = get_object_or_404(Address, id=address_id, user=user)
 
-        total = sum(item.product.price * item.quantity for item in items)
+        subtotal = sum(item.product.price * item.quantity for item in items)
+
+        platform_fee = 15
+
+        total = subtotal + platform_fee
 
         # CREATE ORDER ONLY AFTER PAYMENT SUCCESS
         order = Order.objects.create(
@@ -1056,7 +1064,11 @@ class CreateOrder(APIView):
 
         address = get_object_or_404(Address, id=address_id, user=user)
 
-        total = sum(item.product.price * item.quantity for item in items)
+        subtotal = sum(item.product.price * item.quantity for item in items)
+
+        platform_fee = 15
+
+        total = subtotal + platform_fee
 
         order = Order.objects.create(
         user=user,
