@@ -10,7 +10,6 @@ urlpatterns = [
     path("auth/reset-password/", ResetPassword.as_view()),
 
     path("ai-chat/", AIChatView.as_view()),
-    path("products/all/", AllProducts.as_view()),
 
     # CATEGORY
     path('categories/', CategoryList.as_view()),

@@ -1,31 +1,42 @@
-from rest_framework.views import APIView
-from google import genai
-from rest_framework.response import Response
-from django.shortcuts import get_object_or_404
-from django.db.models import Q
-from .models import *
-from .serializers import *
-from django.utils import timezone
 from datetime import timedelta
-from rest_framework import status
-from django.contrib.auth.models import User
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.utils.encoding import force_bytes, force_str
-from django.core.mail import send_mail
-from urllib.parse import quote,unquote
-from django.contrib.auth import authenticate
-from django.db.models import Sum,Avg,Count
-from django.conf import settings
-from django.db.models.functions import Coalesce,TruncDate,Round
-from rest_framework.permissions import IsAuthenticated,IsAuthenticatedOrReadOnly,IsAdminUser
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import ProductSerializer
-import razorpay
+from urllib.parse import quote, unquote
+
 import json
 import re
+
+import razorpay
+from google import genai
+
+from django.conf import settings
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
+from django.db.models import Avg, Count, Q, Sum
+from django.db.models.functions import Coalesce, Round, TruncDate
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import (
+    urlsafe_base64_decode,
+    urlsafe_base64_encode,
+)
+
+from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.permissions import (
+    IsAdminUser,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+
+from .models import *
+from .serializers import *
+
 
 def get_gemini_client():
     return genai.Client(api_key=settings.GEMINI_API)
@@ -46,7 +57,7 @@ class RegisterUser(APIView):
         if not email:
             return Response({"error": "Email is required"}, status=400)
 
-        # ✅ PASSWORD VALIDATION
+        #  PASSWORD VALIDATION
         if len(password) < 8:
             return Response({"error": "Password must be at least 8 characters"}, status=400)
 
@@ -114,7 +125,7 @@ class ForgotPassword(APIView):
 
             send_mail(
                     "Password Reset",
-                    "",   # ❌ remove plain text
+                    "", 
                     "noreply@petty.com",
                     [email],
                     html_message=f"""
@@ -147,7 +158,7 @@ class ResetPassword(APIView):
         token = unquote(request.data.get("token"))
         password = request.data.get("password")
 
-        # ✅ VALIDATION
+        #  VALIDATION
         if len(password) < 8:
             return Response({"error": "Password must be at least 8 characters"}, status=400)
 
@@ -267,7 +278,7 @@ class AIChatView(APIView):
             else:
                 data = {"reply": text, "product_ids": []}
 
-            # ✅ FIX: keep only valid IDs
+            # 
             valid_ids = set(products.values_list("id", flat=True))
             product_ids = [pid for pid in data.get("product_ids", []) if pid in valid_ids][:3]
 
@@ -296,18 +307,6 @@ class AIChatView(APIView):
                 "products": []
             }, status=500)
         
-class AllProducts(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        products = Product.objects.filter(is_approved=True)
-        serializer = ProductSerializer(
-                            products,
-                            many=True,
-                            context={"request": request}   # ✅ FIX
-                        )
-        return Response(serializer.data)      
-
 # PRODUCTS
 class ApproveProduct(APIView):
     permission_classes = [IsAdminUser]
