@@ -162,7 +162,14 @@ class VerifyOTP(APIView):
                     {"error": "Invalid OTP"},
                     status=400
                 )
-
+            
+            if otp_obj.created_at < timezone.now() - timedelta(minutes=5):
+                otp_obj.delete()
+                return Response(
+                    {"error": "OTP expired"},
+                    status=400
+                )
+                
             refresh = RefreshToken.for_user(user)
 
             otp_obj.delete()

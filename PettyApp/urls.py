@@ -5,7 +5,8 @@ urlpatterns = [
     
     path('auth/register/', RegisterUser.as_view()),
     path('auth/login/', LoginUser.as_view()),
-
+    path("auth/verify-otp/", VerifyOTP.as_view()),
+    
     path("auth/forgot-password/", ForgotPassword.as_view()),
     path("auth/reset-password/", ResetPassword.as_view()),
 
