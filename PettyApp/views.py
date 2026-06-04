@@ -104,7 +104,10 @@ class LoginUser(APIView):
                 status=400
             )
 
-        user = authenticate(username=username, password=password)
+        user = authenticate(
+            username=username,
+            password=password
+        )
 
         if user is None:
             return Response(
@@ -112,12 +115,68 @@ class LoginUser(APIView):
                 status=401
             )
 
-        refresh = RefreshToken.for_user(user)
+        profile, created = Profile.objects.get_or_create(
+            user=user
+        )
+
+        if not profile.phone:
+            return Response(
+                {
+                    "error": "Phone number not found. Please update your profile."
+                },
+                status=400
+            )
+
+        otp = str(random.randint(100000, 999999))
+
+        OTP.objects.filter(user=user).delete()
+
+        OTP.objects.create(
+            user=user,
+            code=otp
+        )
+
+        send_otp(profile.phone, otp)
 
         return Response({
-            "access": str(refresh.access_token),
-            "refresh": str(refresh),
+            "message": "OTP sent successfully",
+            "username": user.username
         })
+    
+class VerifyOTP(APIView):
+
+    def post(self, request):
+        username = request.data.get("username")
+        otp = request.data.get("otp")
+
+        try:
+            user = User.objects.get(username=username)
+
+            otp_obj = OTP.objects.filter(
+                user=user,
+                code=otp
+            ).first()
+
+            if not otp_obj:
+                return Response(
+                    {"error": "Invalid OTP"},
+                    status=400
+                )
+
+            refresh = RefreshToken.for_user(user)
+
+            otp_obj.delete()
+
+            return Response({
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+            })
+
+        except User.DoesNotExist:
+            return Response(
+                {"error": "User not found"},
+                status=404
+            )    
     
 class ForgotPassword(APIView):
 
