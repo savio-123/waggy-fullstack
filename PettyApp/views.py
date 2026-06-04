@@ -3,6 +3,7 @@ from urllib.parse import quote, unquote
 
 import json
 import re
+import random
 
 import razorpay
 from google import genai
@@ -36,6 +37,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import *
 from .serializers import *
+from .utils import send_otp
 
 
 def get_gemini_client():
@@ -46,6 +48,7 @@ class RegisterUser(APIView):
     def post(self, request):
         username = request.data.get("username")
         email = request.data.get("email")
+        phone = request.data.get("phone")
         password = request.data.get("password")
 
         if User.objects.filter(username=username).exists():
@@ -56,6 +59,12 @@ class RegisterUser(APIView):
         
         if not email:
             return Response({"error": "Email is required"}, status=400)
+        
+        if not phone:
+            return Response(
+                {"error": "Phone number is required"},
+                status=400
+            )
 
         #  PASSWORD VALIDATION
         if len(password) < 8:
@@ -74,6 +83,11 @@ class RegisterUser(APIView):
             username=username,
             email=email,
             password=password
+        )
+
+        Profile.objects.create(
+            user=user,
+            phone=phone
         )
 
         return Response({"message": "User created successfully"})
