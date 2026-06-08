@@ -304,6 +304,14 @@ class AIChatView(APIView):
             IMPORTANT:
             - NEVER mention product IDs in reply
             - ALWAYS use product names in reply
+            - Treat these words as similar:
+                dress = t-shirt = shirt = outfit = clothing = apparel
+                cloth = clothing = dress = t-shirt = sweater
+
+                If a user asks for a pink dress and a pink dog t-shirt exists,
+                recommend the t-shirt instead of saying no products found.
+
+                Always prefer approximate matches over no matches.
 
             You must understand:
             1. Pet type (dog, cat, bird, etc.)
