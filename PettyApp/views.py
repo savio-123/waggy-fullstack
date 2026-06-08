@@ -340,7 +340,7 @@ class AIChatView(APIView):
               "product_ids": [1,2,3]
             }}
             """
-            print("GEMINI API:", settings.GEMINI_API)
+
             client = get_gemini_client()
 
             response = client.models.generate_content(
