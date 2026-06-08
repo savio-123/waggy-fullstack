@@ -267,7 +267,6 @@ class ResetPassword(APIView):
             return Response({"error": "Invalid request"}, status=400)
         
 class AIChatView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         message = request.data.get("message")
