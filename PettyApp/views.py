@@ -377,14 +377,10 @@ class AIChatView(APIView):
             })
 
         except Exception as e:
-            if "429" in str(e):
-                return Response({
-                    "reply": "⚠️ AI is temporarily busy. Please try again in a minute.",
-                    "products": []
-                })
+            print("AI ERROR:", repr(e))
 
             return Response({
-                "reply": "⚠️ Something went wrong. Please try again.",
+                "reply": str(e),
                 "products": []
             }, status=500)
         
