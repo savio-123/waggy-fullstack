@@ -30,6 +30,7 @@ from rest_framework.permissions import (
     IsAdminUser,
     IsAuthenticated,
     IsAuthenticatedOrReadOnly,
+    AllowAny
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -267,6 +268,7 @@ class ResetPassword(APIView):
             return Response({"error": "Invalid request"}, status=400)
         
 class AIChatView(APIView):
+    permission_classes = [AllowAny]
 
     def post(self, request):
         message = request.data.get("message")
